@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Kedima - Treino com Nível e Foco</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      max-width: 700px;
+      margin: 30px auto;
+      background: #fff0f5;
+      padding: 20px;
+      border-radius: 16px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+
+    h1, h2 {
+      text-align: center;
+      color: #b83b5e;
+    }
+
+    label, select, button {
+      font-size: 18px;
+      margin: 10px 0;
+      display: block;
+      width: 100%;
+    }
+
+    select, button {
+      padding: 8px;
+      border-radius: 8px;
+    }
+
+    button {
+      background-color: #ff69b4;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background-color: #e754a1;
+    }
+
+    pre {
+      background: #fefefe;
+      padding: 15px;
+      white-space: pre-wrap;
+      border-left: 4px solid #ff69b4;
+      border-radius: 8px;
+      margin-top: 20px;
+    }
+
+    .versiculo {
+      text-align: center;
+      font-style: italic;
+      margin-top: 20px;
+      color: #555;
+    }
+  </style>
+</head>
+<body>
+  <h1>Kedima 💪 Treino Inteligente</h1>
+
+  <label for="nivel">1️⃣ Escolha o nível do treino:</label>
+  <select id="nivel" onchange="habilitarFoco()">
+    <option value="">-- Selecione --</option>
+    <option value="normal">Normal</option>
+    <option value="endoidou">Endoidou</option>
+    <option value="caba">O Caba Endoidou</option>
+  </select>
+
+  <label for="foco">2️⃣ Escolha o foco do treino:</label>
+  <select id="foco" disabled>
+    <option value="">-- Selecione --</option>
+    <option value="superior">Superior</option>
+    <option value="inferior">Inferior</option>
+    <option value="abdomen">Abdômen</option>
+    <option value="misto">Corpo Inteiro</option>
+  </select>
+
+  <button onclick="gerarPlano()">3️⃣ Gerar Plano de Treino</button>
+
+  <h2>Plano de Treino</h2>
+  <pre id="resultado">Seu treino aparecerá aqui...</pre>
+
+  <div class="versiculo" id="mensagemFinal"></div>
+
+  <script>
+    const exercicios = {
+      aquecimento: ["Polichinelos (1min)", "Corrida no lugar (1min)", "Pular corda imaginária (1min)", "Mobilidade articular (2min)"],
+      alongamento: ["Toque os pés", "Alongamento de tríceps", "Círculos com os braços", "Respiração profunda (2min)"],
+      superior: {
+        normal: ["Flexões (3x10)", "Tríceps no banco (3x12)", "Elevação lateral (3x10)", "Prancha alta (30s)"],
+        endoidou: ["Flexões (4x15)", "Tríceps banco (4x15)", "Elevação lateral (4x15)", "Prancha alta (1min)"],
+        caba: ["Flexão explosiva (5x20)", "Tríceps hardcore (5x20)", "Elevação com peso (5x20)", "Prancha (2min)"]
+      },
+      inferior: {
+        normal: ["Agachamento (3x15)", "Afundo (3x10 cada perna)", "Ponte de glúteo (3x15)", "Degrau (3x12)"],
+        endoidou: ["Agachamento salto (4x20)", "Afundo alternado (4x15)", "Ponte glúteo (4x20)", "Degrau rápido (4x15)"],
+        caba: ["Agacho c/ peso (5x25)", "Afundo com avanço (5x20)", "Ponte c/ perna elevada (5x20)", "Degrau sprint (5x20)"]
+      },
+      abdomen: {
+        normal: ["Abdominal (3x15)", "Prancha (30s)", "Bicicleta (3x20)", "Elevação pernas (3x15)"],
+        endoidou: ["Abdominal (4x30)", "Prancha (1min)", "Bicicleta (4x40)", "Elevação pernas (4x30)"],
+        caba: ["Abdominal c/ peso (5x50)", "Prancha c/ toques (2min)", "Bicicleta rápida (5x60)", "Elevação pernas (5x50)"]
+      }
+    };
+
+    const descanso = {
+      normal: "⏸️ Descanso: 30 segundos entre os exercícios.",
+      endoidou: "⏸️ Descanso: 20 segundos entre os exercícios.",
+      caba: "⏸️ Descanso: 10 segundos... só Deus sabe!"
+    };
+
+    const mensagensBiblicas = [
+      "“Posso todas as coisas naquele que me fortalece!” (Fp 4:13) — Até 5 séries de burpees, minha irmã!",
+      "“O choro pode durar uma noite...” (Sl 30:5) — Mas o glúteo dura pra sempre!",
+      "“Levanta-te e anda!” (Jo 5:8) — E aproveita e faz um agachamento também!",
+      "“Esforça-te e tem bom ânimo” (Js 1:9) — A preguiça não paga boleto nem derrete panetone!",
+      "“Revesti-vos de toda a armadura de Deus...” (Ef 6:11) — E de um top firme porque hoje é dia de treino pesado!"
+    ];
+
+    function habilitarFoco() {
+      const nivel = document.getElementById('nivel').value;
+      document.getElementById('foco').disabled = !nivel;
+    }
+
+    function escolherAleatorios(lista, n) {
+      const copia = [...lista];
+      for (let i = copia.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [copia[i], copia[j]] = [copia[j], copia[i]];
+      }
+      return copia.slice(0, n);
+    }
+
+    function gerarPlano() {
+      const nivel = document.getElementById('nivel').value;
+      const foco = document.getElementById('foco').value;
+      if (!nivel || !foco) {
+        alert("Escolha o nível e o foco antes de gerar o plano.");
+        return;
+      }
+
+      let plano = [];
+      plano.push("🔥 Nível: " + nivel.toUpperCase());
+      plano.push("🎯 Foco: " + (foco === "misto" ? "Corpo Inteiro" : foco.charAt(0).toUpperCase() + foco.slice(1)));
+
+      plano.push("\n🟡 Aquecimento:");
+      plano.push(...escolherAleatorios(exercicios.aquecimento, 2));
+
+      const partes = foco === "misto" ? ["superior", "inferior", "abdomen"] : [foco];
+
+      partes.forEach(parte => {
+        plano.push(`\n💪 ${parte.charAt(0).toUpperCase() + parte.slice(1)}:`);
+        plano.push(...escolherAleatorios(exercicios[parte][nivel], 3));
+      });
+
+      plano.push("\n🧘 Alongamento:");
+      plano.push(...escolherAleatorios(exercicios.alongamento, 2));
+
+      plano.push("\n" + descanso[nivel]);
+
+      const resultado = plano.map(item => item.endsWith(":") ? `\n${item}` : `- ${item}`).join('\n');
+      document.getElementById('resultado').textContent = resultado;
+
+      const mensagem = mensagensBiblicas[Math.floor(Math.random() * mensagensBiblicas.length)];
+      document.getElementById('mensagemFinal').textContent = mensagem;
+    }
+  </script>
+</body>
+</html>
+
+
